@@ -1,7 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import { join } from "path";
+import cloudinary from "@/lib/cloudinary";
+
+// Función auxiliar para subir el archivo a Cloudinary
+const uploadToCloudinary = (fileBuffer, fileName) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "auto",
+        folder: "evidencias",
+        public_id: fileName.split('.')[0],
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
 
 export async function GET() {
   try {
@@ -12,7 +29,8 @@ export async function GET() {
     });
     return NextResponse.json(funas);
   } catch (error) {
-    return NextResponse.json({ error: "No se pudieron obtener las funas." }, { status: 500 });
+    console.error("Error en GET /api/funas:", error);
+    return NextResponse.json({ error: "No se pudieron obtener los reportes." }, { status: 500 });
   }
 }
 
@@ -38,10 +56,10 @@ export async function POST(request) {
 
     const nuevaFuna = await prisma.funa.create({
       data: {
-        nombre,
-        ciudad,
-        descripcion,
-        etiquetas,
+        nombre: nombre?.toString() || "",
+        ciudad: ciudad?.toString() || "",
+        descripcion: descripcion?.toString() || "",
+        etiquetas: etiquetas?.toString() || "",
         mediaUrl,
       },
     });
