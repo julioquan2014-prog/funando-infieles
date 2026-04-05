@@ -1,4 +1,5 @@
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata = {
   title: "Funando Infieles | Exponiendo la traición",
@@ -12,6 +13,22 @@ export default function RootLayout({ children }) {
         <div className="floating-bg" style={{ top: '10%', left: '10%' }}></div>
         <div className="floating-bg" style={{ bottom: '20%', right: '10%', animationDelay: '5s' }}></div>
         <main>{children}</main>
+
+        {/* Monetización AdCash - No intrusiva */}
+        <Script 
+          src="//acdn.adcash.com/script/aclib.js" 
+          strategy="lazyOnload" 
+        />
+        <Script id="adcash-init" strategy="lazyOnload">
+          {`
+            window.aclib = window.aclib || {};
+            if (typeof aclib.runAutoTag === 'function') {
+              aclib.runAutoTag({
+                zoneId: 'kchelmrqje',
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   );
