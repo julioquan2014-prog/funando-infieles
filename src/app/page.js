@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import FunaForm from '@/components/FunaForm';
 import FunaDetail from '@/components/FunaDetail';
 import { useRouter } from 'next/navigation';
-import { Search, Eye, MapPin, Tag, PlusCircle, ArrowRight, TrendingUp, LogOut, ShieldAlert, Trash2 } from 'lucide-react';
+import { Search, Eye, MapPin, Tag, PlusCircle, ArrowRight, TrendingUp, LogOut, ShieldAlert, Trash2, Users } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedFuna, setSelectedFuna] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [visitCount, setVisitCount] = useState(0);
 
   const fetchUser = async () => {
     try {
@@ -41,6 +42,16 @@ export default function Home() {
     }
   };
 
+  const fetchVisits = async () => {
+    try {
+      const res = await fetch('/api/visits');
+      const data = await res.json();
+      if (res.ok) setVisitCount(data.totalVisits);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm("¿Estás seguro de eliminar este reporte de forma permanente?")) return;
     try {
@@ -65,11 +76,13 @@ export default function Home() {
   useEffect(() => {
     fetchUser();
     fetchFunas();
+    fetchVisits();
   }, []);
 
   const filteredFunas = funas.filter(funa => 
     funa.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    funa.ciudad.toLowerCase().includes(searchTerm.toLowerCase())
+    funa.ciudad.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (funa.etiquetas && funa.etiquetas.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const isAdmin = user?.role === 'ADMIN';
@@ -136,7 +149,9 @@ export default function Home() {
       {/* Header / Hero */}
       <header style={{ padding: '80px 0 60px', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '99px', background: 'rgba(230, 57, 70, 0.1)', color: 'var(--accent-color)', marginBottom: '24px', fontSize: '0.9rem', fontWeight: '600' }}>
-          <TrendingUp size={16} /> Tendencia: Reportes anónimos seguros
+          <TrendingUp size={16} /> Tendencia: Reportes anónimos seguros 
+          <span style={{ margin: '0 8px', opacity: 0.3 }}>|</span>
+          <Users size={16} /> {visitCount} Investigadores
         </div>
         <h1 className="text-gradient" style={{ fontSize: 'env(preset-font-size, 4.5rem)', marginBottom: '15px', lineHeight: '1.1' }}>
           {isAdmin ? `Panel de Control, ${user?.nombre}` : 'Exponiendo la Traición'}
