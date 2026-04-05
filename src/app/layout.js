@@ -16,7 +16,8 @@ export default function RootLayout({ children }) {
 
         {/* Monetización AdCash - No intrusiva */}
         <Script 
-          src="//acdn.adcash.com/script/aclib.js" 
+          src="//acscdn.com/script/aclib.js" 
+          id="aclib"
           strategy="lazyOnload" 
         />
         <Script id="adcash-init" strategy="lazyOnload">
@@ -24,7 +25,7 @@ export default function RootLayout({ children }) {
             window.aclib = window.aclib || {};
             if (typeof aclib.runAutoTag === 'function') {
               aclib.runAutoTag({
-                zoneId: 'kchelmrqje',
+                zoneId: 'calmprmp6u',
               });
             }
           `}
